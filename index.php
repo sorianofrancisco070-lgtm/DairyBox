@@ -2,10 +2,12 @@
 session_start();
 if (isset($_SESSION['user'])) {
     $role = $_SESSION['user']['role'];
-    if ($role === 'farm_manager') header('Location: Farm_Managers_User/dashboard.php');
-    elseif ($role === 'farm_caretaker') header('Location: Farm_Caretakers_USer/dashboard.php');
-    elseif ($role === 'dairy_cooperative') header('Location: Dairy_Cooperatives_USer/dashboard.php');
-    elseif ($role === 'veterinarian') header('Location: Veterinarians_User/dashboard.php');
+    $proto = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $base  = $proto . '://' . $_SERVER['HTTP_HOST'];
+    if ($role === 'farm_manager')      header('Location: ' . $base . '/Farm_Managers_User/dashboard.php');
+    elseif ($role === 'farm_caretaker') header('Location: ' . $base . '/Farm_Caretakers_USer/dashboard.php');
+    elseif ($role === 'dairy_cooperative') header('Location: ' . $base . '/Dairy_Cooperatives_USer/dashboard.php');
+    elseif ($role === 'veterinarian')  header('Location: ' . $base . '/Veterinarians_User/dashboard.php');
     exit;
 }
 ?>
@@ -26,6 +28,7 @@ if (isset($_SESSION['user'])) {
                 <img src="assets/img/logo.png" alt="DairyBox Logo" class="login-logo" onerror="this.style.display='none'">
                 <h2 class="mt-2 fw-bold text-success">🐃 DairyBox</h2>
                 <p class="text-muted small">Production & Herd Health System</p>
+                <small class="text-muted" style="font-size:.7rem">South East Asian Institute of Technology</small>
             </div>
 
             <?php if (isset($_GET['error'])): ?>
@@ -73,7 +76,7 @@ if (isset($_SESSION['user'])) {
             </form>
             <hr>
             <p class="text-center text-muted small mb-0">
-                South East Asian Institute of Technology &copy; <?= date('Y') ?>
+                &copy; <?= date('Y') ?> South East Asian Institute of Technology
             </p>
         </div>
     </div>
