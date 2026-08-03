@@ -1,0 +1,29 @@
+# DairyBox – Git line ending rules
+
+# Default: auto-convert to CRLF on Windows checkout
+* text=auto
+
+# Shell scripts MUST stay LF (runs inside Linux Docker container)
+*.sh text eol=lf
+
+# Dockerfile must stay LF
+Dockerfile text eol=lf
+
+# PHP, HTML, CSS, JS – auto
+*.php text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.sql text eol=lf
+*.md text eol=lf
+
+# Binary files – no conversion
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary

@@ -1,0 +1,46 @@
+# =========================================================
+# DairyBox – Render Blueprint
+# Defines: 1 Web Service (Docker/PHP) + 1 MySQL Database
+# Deploy: https://dashboard.render.com/blueprints
+# =========================================================
+
+services:
+  # ---- PHP Web Application ----
+  - type: web
+    name: dairybox-app
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free                      # Change to "starter" for production
+    healthCheckPath: /index.php
+
+    envVars:
+      - key: DB_HOST
+        fromDatabase:
+          name: dairybox-mysql
+          property: host
+
+      - key: DB_PORT
+        fromDatabase:
+          name: dairybox-mysql
+          property: port
+
+      - key: DB_NAME
+        fromDatabase:
+          name: dairybox-mysql
+          property: database
+
+      - key: DB_USER
+        fromDatabase:
+          name: dairybox-mysql
+          property: user
+
+      - key: DB_PASS
+        fromDatabase:
+          name: dairybox-mysql
+          property: password
+
+# ---- MySQL Database ----
+databases:
+  - name: dairybox-mysql
+    databaseName: dairybox_db
+    plan: free                      # Change to "starter" for production

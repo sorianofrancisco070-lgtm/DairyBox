@@ -1,0 +1,29 @@
+# DairyBox – Apache Configuration
+Options -Indexes
+
+# Protect sensitive directories
+<FilesMatch "\.(sql|log|md)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Protect config directory
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Block direct access to config/ and database/
+    RewriteRule ^config/ - [F,L]
+    RewriteRule ^database/ - [F,L]
+
+    # Optional: remove .php extension
+    # RewriteCond %{REQUEST_FILENAME} !-d
+    # RewriteCond %{REQUEST_FILENAME}\.php -f
+    # RewriteRule ^(.*)$ $1.php [NC,L]
+</IfModule>
+
+# PHP settings
+<IfModule mod_php.c>
+    php_flag display_errors Off
+    php_value session.cookie_httponly 1
+    php_value session.use_strict_mode 1
+</IfModule>

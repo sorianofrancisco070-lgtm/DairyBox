@@ -1,0 +1,26 @@
+# Git
+.git
+.gitignore
+
+# Docs
+README.md
+*.md
+
+# Temp / test files
+_test_*.php
+setup.php
+
+# Node (if any)
+node_modules
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode
+.idea
+*.code-workspace
+
+# Logs
+*.log
