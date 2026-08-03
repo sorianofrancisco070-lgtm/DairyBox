@@ -24,7 +24,14 @@ RUN a2enmod rewrite
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy all project files
+# ── CACHE BUSTER ──────────────────────────────────────────
+# This ARG changes on every deploy so Docker always re-copies
+# the latest files instead of using a cached layer.
+ARG CACHEBUST=1
+RUN echo "Cache bust: ${CACHEBUST}"
+# ──────────────────────────────────────────────────────────
+
+# Copy all project files (always fresh due to CACHEBUST above)
 COPY . /var/www/html/
 
 # Set correct permissions
