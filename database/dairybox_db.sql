@@ -2,9 +2,10 @@
 -- DairyBox Production & Herd Health System
 -- Database Schema
 -- =========================================================
-
-CREATE DATABASE IF NOT EXISTS dairybox_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE dairybox_db;
+-- NOTE: Run this against your existing database.
+-- CREATE DATABASE and USE are intentionally omitted
+-- so this works on Railway, Render, Aiven, etc.
+-- ---------------------------------------------------------
 
 -- ---------------------------------------------------------
 -- Users (role-based)

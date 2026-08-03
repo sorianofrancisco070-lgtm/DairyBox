@@ -1,10 +1,10 @@
 # =========================================================
 # DairyBox – Dockerfile
-# PHP 8.2 + Apache + MySQL client
+# PHP 8.2 + Apache
 # =========================================================
 FROM php:8.2-apache
 
-# Install PHP extensions and tools
+# Install PHP extensions and system tools
 RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
@@ -41,7 +41,7 @@ RUN echo '<Directory /var/www/html>\n\
 </Directory>' > /etc/apache2/conf-available/dairybox.conf \
     && a2enconf dairybox
 
-# PHP config – production settings
+# PHP production settings
 RUN echo "display_errors = Off\n\
 log_errors = On\n\
 error_log = /var/log/apache2/php_errors.log\n\
@@ -59,5 +59,5 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 # Expose port 80
 EXPOSE 80
 
-# Use entrypoint to init DB then start Apache
+# Start via entrypoint
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
