@@ -8,15 +8,12 @@ error_reporting(E_ALL);
 
 require_once '../config/database.php';
 
-// Use same session config as the rest of the app
 if (session_status() === PHP_SESSION_NONE) {
     $sessionPath = '/tmp/dairybox_sessions';
     if (!is_dir($sessionPath)) mkdir($sessionPath, 0777, true);
-    ini_set('session.save_path', $sessionPath);
-    ini_set('session.gc_maxlifetime', 86400);
-    ini_set('session.cookie_lifetime', 86400);
+    ini_set('session.save_path',      $sessionPath);
+    ini_set('session.gc_maxlifetime',  86400);
     ini_set('session.cookie_httponly', 1);
-    ini_set('session.name', 'DAIRYBOX_SESS');
     session_start();
 }
 
@@ -69,6 +66,9 @@ try {
 
 if ($user && password_verify($password, $user['password'])) {
     session_regenerate_id(true);
+
+    // Clear any stale DAIRYBOX_SESS cookie left from previous attempts
+    setcookie('DAIRYBOX_SESS', '', time() - 3600, '/');
 
     $_SESSION['user'] = [
         'id'        => $user['id'],

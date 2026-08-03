@@ -2,21 +2,17 @@
 // =========================================================
 // DairyBox – Session & Auth Helper
 // =========================================================
-
-// Configure session BEFORE starting it
 if (session_status() === PHP_SESSION_NONE) {
-    // Use /tmp which is always writable on Render/Docker
     $sessionPath = '/tmp/dairybox_sessions';
     if (!is_dir($sessionPath)) {
         mkdir($sessionPath, 0777, true);
     }
-    ini_set('session.save_path', $sessionPath);
+    ini_set('session.save_path',     $sessionPath);
     ini_set('session.gc_maxlifetime', 86400);
-    ini_set('session.cookie_lifetime', 86400);
+    ini_set('session.cookie_lifetime', 0);
     ini_set('session.cookie_httponly', 1);
     ini_set('session.use_strict_mode', 1);
-    ini_set('session.name', 'DAIRYBOX_SESS');
-
+    // Do NOT set a custom session.name — use default PHPSESSID everywhere
     session_start();
 }
 
@@ -44,11 +40,7 @@ if (!function_exists('requireLogin')) {
         $host     = $_SERVER['HTTP_HOST'];
         $script   = str_replace('\\', '/', $_SERVER['SCRIPT_NAME']);
         $parts    = explode('/', trim($script, '/'));
-
-        // Remove filename
-        array_pop($parts);
-
-        // Remove known subfolder if present
+        array_pop($parts); // remove filename
         $knownFolders = [
             'modules', 'auth',
             'Farm_Managers_User', 'Farm_Caretakers_USer',
@@ -58,7 +50,6 @@ if (!function_exists('requireLogin')) {
         if (!empty($parts) && in_array(end($parts), $knownFolders)) {
             array_pop($parts);
         }
-
         $base = rtrim('/' . implode('/', array_filter($parts)), '/');
         return $protocol . '://' . $host . $base;
     }
@@ -70,5 +61,4 @@ if (!function_exists('requireLogin')) {
         header('Location: ' . $url);
         exit;
     }
-
 }
