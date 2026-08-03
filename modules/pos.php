@@ -78,6 +78,13 @@ if (isset($_GET['get_products'])) {
 
 $products = $db->query("SELECT id,product_code,name,category,unit,selling_price,stock_qty FROM coop_products WHERE is_active=1 ORDER BY category,name")->fetchAll();
 
+// Load payment settings for cashless display
+$paymentSettings = [];
+try {
+    $ps = $db->query("SELECT * FROM coop_payment_settings WHERE is_active=1 ORDER BY method")->fetchAll();
+    foreach ($ps as $p) $paymentSettings[$p['method']] = $p;
+} catch (Exception $e) { /* table may not exist yet */ }
+
 include '../includes/header.php';
 ?>
 
@@ -366,14 +373,23 @@ include '../includes/header.php';
             <input type="text" id="customerName" class="form-control form-control-sm mb-2" value="Walk-in Customer">
 
             <label class="form-label fw-semibold" style="font-size:.82rem">Payment Method</label>
-            <select id="paymentMethod" class="form-select form-select-sm mb-2">
+            <select id="paymentMethod" class="form-select form-select-sm mb-2" onchange="onPaymentChange()">
                 <option value="Cash">💵 Cash</option>
+                <?php foreach ($paymentSettings as $m => $ps): ?>
+                <option value="<?= htmlspecialchars($m) ?>"><?= htmlspecialchars($ps['display_name']) ?></option>
+                <?php endforeach; ?>
+                <?php
+                // Fallback options if no settings configured
+                if (empty($paymentSettings)):
+                ?>
                 <option value="GCash">📱 GCash</option>
                 <option value="Maya">📱 Maya</option>
                 <option value="Bank Transfer">🏦 Bank Transfer</option>
                 <option value="Credit">💳 Credit</option>
+                <?php endif; ?>
             </select>
 
+            <!-- Cash section -->
             <div id="cashSection">
                 <label class="form-label fw-semibold" style="font-size:.82rem">Amount Tendered (₱)</label>
                 <input type="number" id="amountTendered" min="0" step="0.01" value="0"
@@ -381,6 +397,14 @@ include '../includes/header.php';
                 <div class="d-flex justify-content-between" style="font-size:.82rem">
                     <span>Change:</span>
                     <strong class="text-success" id="changeVal">₱0.00</strong>
+                </div>
+            </div>
+
+            <!-- Cashless payment details panel -->
+            <div id="cashlessSection" style="display:none">
+                <div id="cashlessPanel" class="mt-1 p-3 rounded text-center"
+                     style="background:#f0fdf4;border:2px dashed #28a745">
+                    <!-- filled by JS -->
                 </div>
             </div>
         </div>
@@ -428,7 +452,61 @@ include '../includes/header.php';
 let cart = [];
 const isMobile = () => window.innerWidth <= 900;
 
-// ── Mobile cart drawer ───────────────────────────────────
+// Payment settings from PHP
+const paymentSettings = <?= json_encode($paymentSettings) ?>;
+const rootPath        = '<?= $root ?>';
+
+// ── Payment method change ────────────────────────────────
+function onPaymentChange() {
+    const method   = document.getElementById('paymentMethod').value;
+    const cashDiv  = document.getElementById('cashSection');
+    const cashless = document.getElementById('cashlessSection');
+    const panel    = document.getElementById('cashlessPanel');
+
+    if (method === 'Cash') {
+        cashDiv.style.display  = '';
+        cashless.style.display = 'none';
+        return;
+    }
+
+    cashDiv.style.display  = 'none';
+    cashless.style.display = '';
+
+    const ps = paymentSettings[method];
+    if (!ps) {
+        panel.innerHTML = `<p class="text-muted small mb-0"><i class="fa fa-info-circle me-1"></i>No payment details set up. <a href="payment_settings.php">Configure here →</a></p>`;
+        return;
+    }
+
+    // Build QR + details display
+    let html = `<div style="font-size:.88rem">`;
+
+    // QR image
+    if (ps.qr_image) {
+        html += `
+        <div class="mb-2">
+            <img src="${rootPath}${ps.qr_image}?v=${Date.now()}"
+                 alt="${ps.display_name} QR"
+                 style="width:160px;height:160px;object-fit:contain;border:2px solid #d4edda;border-radius:10px;padding:6px;background:#fff">
+            <div style="font-size:.72rem;color:#6c757d;margin-top:.2rem">Scan to pay</div>
+        </div>`;
+    }
+
+    html += `<div class="fw-bold text-success" style="font-size:1rem">${escHtml(ps.display_name)}</div>`;
+
+    if (ps.account_name) {
+        html += `<div class="mt-1"><i class="fa fa-user me-1 text-muted"></i><strong>${escHtml(ps.account_name)}</strong></div>`;
+    }
+    if (ps.account_number) {
+        html += `<div style="font-size:1.1rem;font-weight:700;color:#1a6b3c;letter-spacing:.5px">${escHtml(ps.account_number)}</div>`;
+    }
+    if (ps.instructions) {
+        html += `<div class="mt-2 p-2 rounded" style="background:rgba(40,167,69,.08);font-size:.8rem;color:#555">${escHtml(ps.instructions)}</div>`;
+    }
+
+    html += `</div>`;
+    panel.innerHTML = html;
+}
 function openCart() {
     document.getElementById('cartSection').classList.add('open');
     document.getElementById('cartOverlay').classList.add('show');
