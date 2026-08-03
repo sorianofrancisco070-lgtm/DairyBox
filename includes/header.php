@@ -51,9 +51,10 @@ $myBottomNav = $bottomNavItems[$user['role']] ?? [];
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="theme-color" content="#1a6b3c">
+    <meta name="build" content="<?= date('YmdHis') ?>">
     <title><?= htmlspecialchars($pageTitle ?? 'DairyBox') ?> | DairyBox</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="<?= $root ?>assets/css/style.css">
+    <link rel="stylesheet" href="<?= $root ?>assets/css/style.css?v=<?= date('YmdHis') ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
