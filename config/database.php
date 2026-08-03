@@ -5,7 +5,7 @@
 define('DB_HOST', 'sakura.proxy.rlwy.net');
 define('DB_USER', 'root');
 define('DB_PASS', 'XrpDTsTYMBkAWcoFtkafnPRgPaadICZh');
-define('DB_NAME', 'railway');
+define('DB_NAME', 'Railway');
 define('DB_PORT', '52723');
 
 function getDB(): PDO {
