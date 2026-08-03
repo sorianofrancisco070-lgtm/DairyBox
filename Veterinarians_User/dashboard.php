@@ -78,41 +78,108 @@ include '../includes/header.php';
             <?php if (empty($sickList)): ?>
                 <p class="text-success"><i class="fa fa-check me-1"></i>All animals are healthy!</p>
             <?php else: ?>
-            <table class="table table-sm table-hover">
-                <thead><tr><th>Tag</th><th>Name</th><th>Status</th><th>Diagnosis</th><th>Action</th></tr></thead>
-                <tbody>
+
+            <!-- Desktop Table -->
+            <div class="d-none d-md-block table-responsive">
+                <table class="table table-sm table-hover mb-0">
+                    <thead><tr><th>Tag</th><th>Name</th><th>Status</th><th>Diagnosis</th><th>Action</th></tr></thead>
+                    <tbody>
+                    <?php foreach ($sickList as $s): ?>
+                    <tr>
+                        <td><span class="badge bg-success"><?= htmlspecialchars($s['tag_number']) ?></span></td>
+                        <td><?= htmlspecialchars($s['name'] ?? '-') ?></td>
+                        <td><span class="badge-custom badge-sick"><?= $s['health_status'] ?></span></td>
+                        <td><?= htmlspecialchars($s['diagnosis'] ?? 'Pending') ?></td>
+                        <td><a href="../modules/health_records.php?buffalo_id=<?= $s['id'] ?>" class="btn btn-sm btn-outline-danger">View</a></td>
+                    </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mobile Cards -->
+            <div class="d-md-none">
                 <?php foreach ($sickList as $s): ?>
-                <tr>
-                    <td><span class="badge bg-success"><?= htmlspecialchars($s['tag_number']) ?></span></td>
-                    <td><?= htmlspecialchars($s['name'] ?? '-') ?></td>
-                    <td><span class="badge-custom badge-sick"><?= $s['health_status'] ?></span></td>
-                    <td><?= htmlspecialchars($s['diagnosis'] ?? 'Pending') ?></td>
-                    <td><a href="../modules/health_records.php?buffalo_id=<?= $s['id'] ?>" class="btn btn-sm btn-outline-danger">View</a></td>
-                </tr>
+                <div class="mb-2" style="border-left:4px solid #dc3545;background:#fff5f5;border-radius:0 8px 8px 0;padding:.7rem .9rem">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-1">
+                        <div>
+                            <span class="badge bg-success me-1"><?= htmlspecialchars($s['tag_number']) ?></span>
+                            <strong><?= htmlspecialchars($s['name'] ?? '-') ?></strong>
+                        </div>
+                        <span class="badge-custom badge-sick"><?= $s['health_status'] ?></span>
+                    </div>
+                    <div style="font-size:.82rem;color:#555;margin-top:.3rem">
+                        <i class="fa fa-stethoscope me-1"></i><?= htmlspecialchars($s['diagnosis'] ?? 'Pending diagnosis') ?>
+                    </div>
+                    <a href="../modules/health_records.php?buffalo_id=<?= $s['id'] ?>"
+                       class="btn btn-sm btn-outline-danger mt-2 w-100">
+                        <i class="fa fa-eye me-1"></i>View Health Record
+                    </a>
+                </div>
                 <?php endforeach; ?>
-                </tbody>
-            </table>
+            </div>
+
             <?php endif; ?>
         </div>
         <!-- Upcoming Vaccinations -->
         <div class="card-section mt-3">
             <div class="section-title"><i class="fa fa-syringe me-2"></i>Upcoming Vaccinations (30 Days)</div>
-            <table class="table table-sm table-hover">
-                <thead><tr><th>Tag</th><th>Name</th><th>Vaccine</th><th>Due Date</th><th>Status</th></tr></thead>
-                <tbody>
-                <?php foreach ($upcomingV as $v): 
+
+            <?php if (empty($upcomingV)): ?>
+                <p class="text-success mb-0"><i class="fa fa-check-circle me-1"></i>No upcoming vaccinations.</p>
+            <?php else: ?>
+
+            <!-- Desktop Table (hidden on mobile) -->
+            <div class="d-none d-md-block">
+                <div class="table-responsive">
+                <table class="table table-sm table-hover mb-0">
+                    <thead><tr><th>Tag</th><th>Name</th><th>Vaccine</th><th>Due Date</th><th>Status</th></tr></thead>
+                    <tbody>
+                    <?php foreach ($upcomingV as $v):
+                        $overdue = strtotime($v['next_due_date']) < time();
+                    ?>
+                    <tr class="<?= $overdue ? 'table-danger' : '' ?>">
+                        <td><span class="badge bg-success"><?= htmlspecialchars($v['tag_number']) ?></span></td>
+                        <td><?= htmlspecialchars($v['name'] ?? '-') ?></td>
+                        <td><?= htmlspecialchars($v['vaccine_name']) ?></td>
+                        <td><?= $v['next_due_date'] ?></td>
+                        <td><span class="badge-custom <?= $overdue ? 'badge-sick' : 'badge-treated' ?>"><?= $v['status'] ?></span></td>
+                    </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+                </div>
+            </div>
+
+            <!-- Mobile Cards (hidden on desktop) -->
+            <div class="d-md-none">
+                <?php foreach ($upcomingV as $v):
                     $overdue = strtotime($v['next_due_date']) < time();
+                    $cardBorder = $overdue ? '#dc3545' : '#28a745';
+                    $badgeCls   = $overdue ? 'badge-sick' : 'badge-treated';
                 ?>
-                <tr class="<?= $overdue ? 'table-danger' : '' ?>">
-                    <td><span class="badge bg-success"><?= htmlspecialchars($v['tag_number']) ?></span></td>
-                    <td><?= htmlspecialchars($v['name'] ?? '-') ?></td>
-                    <td><?= htmlspecialchars($v['vaccine_name']) ?></td>
-                    <td><?= $v['next_due_date'] ?></td>
-                    <td><span class="badge-custom <?= $overdue ? 'badge-sick' : 'badge-treated' ?>"><?= $v['status'] ?></span></td>
-                </tr>
+                <div class="vacc-card mb-2" style="border-left:4px solid <?= $cardBorder ?>;background:<?= $overdue ? '#fff5f5' : '#f8fff9' ?>;border-radius:0 8px 8px 0;padding:.7rem .9rem;">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-1">
+                        <div>
+                            <span class="badge bg-success me-1"><?= htmlspecialchars($v['tag_number']) ?></span>
+                            <strong><?= htmlspecialchars($v['name'] ?? '-') ?></strong>
+                        </div>
+                        <span class="badge-custom <?= $badgeCls ?>"><?= $v['status'] ?></span>
+                    </div>
+                    <div class="mt-1" style="font-size:.82rem;color:#555">
+                        <i class="fa fa-syringe me-1 text-warning"></i><?= htmlspecialchars($v['vaccine_name']) ?>
+                    </div>
+                    <div style="font-size:.8rem;color:#888;margin-top:.2rem">
+                        <i class="fa fa-calendar me-1"></i>Due: <strong style="color:<?= $overdue ? '#dc3545' : '#1a6b3c' ?>"><?= $v['next_due_date'] ?></strong>
+                        <?php if ($overdue): ?>
+                        <span class="ms-1 text-danger fw-bold">— OVERDUE</span>
+                        <?php endif; ?>
+                    </div>
+                </div>
                 <?php endforeach; ?>
-                </tbody>
-            </table>
+            </div>
+
+            <?php endif; ?>
         </div>
     </div>
 
