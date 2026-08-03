@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS coop_inventory (
 CREATE TABLE IF NOT EXISTS coop_sales (
     id              INT AUTO_INCREMENT PRIMARY KEY,
     receipt_number  VARCHAR(40)  NOT NULL UNIQUE,
-    sale_date       DATE         NOT NULL DEFAULT (CURDATE()),
+    sale_date       DATE         NOT NULL,
     customer_name   VARCHAR(120) DEFAULT 'Walk-in Customer',
     customer_phone  VARCHAR(30),
     subtotal        DECIMAL(12,2) NOT NULL DEFAULT 0.00,
