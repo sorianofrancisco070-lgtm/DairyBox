@@ -2,7 +2,23 @@
 // =========================================================
 // DairyBox – Session & Auth Helper
 // =========================================================
-if (session_status() === PHP_SESSION_NONE) session_start();
+
+// Configure session BEFORE starting it
+if (session_status() === PHP_SESSION_NONE) {
+    // Use /tmp which is always writable on Render/Docker
+    $sessionPath = '/tmp/dairybox_sessions';
+    if (!is_dir($sessionPath)) {
+        mkdir($sessionPath, 0777, true);
+    }
+    ini_set('session.save_path', $sessionPath);
+    ini_set('session.gc_maxlifetime', 86400);
+    ini_set('session.cookie_lifetime', 86400);
+    ini_set('session.cookie_httponly', 1);
+    ini_set('session.use_strict_mode', 1);
+    ini_set('session.name', 'DAIRYBOX_SESS');
+
+    session_start();
+}
 
 if (!function_exists('requireLogin')) {
 
