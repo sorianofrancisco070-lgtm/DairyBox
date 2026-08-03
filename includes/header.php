@@ -15,29 +15,29 @@ $bottomNavItems = [
         ['icon'=>'fa-tachometer-alt', 'label'=>'Dashboard', 'href'=>$root.'Farm_Managers_User/dashboard.php'],
         ['icon'=>'fa-paw',            'label'=>'Buffaloes',  'href'=>$root.'modules/buffaloes.php'],
         ['icon'=>'fa-tint',           'label'=>'Milk',       'href'=>$root.'modules/milk_production.php'],
-        ['icon'=>'fa-chart-line',     'label'=>'Analytics',  'href'=>$root.'modules/production_analytics.php'],
         ['icon'=>'fa-bell',           'label'=>'Alerts',     'href'=>$root.'modules/notifications.php'],
+        ['icon'=>'fa-sign-out-alt',   'label'=>'Logout',     'href'=>$root.'auth/logout.php', 'danger'=>true],
     ],
     'farm_caretaker' => [
-        ['icon'=>'fa-tachometer-alt', 'label'=>'Dashboard',  'href'=>$root.'Farm_Caretakers_USer/dashboard.php'],
-        ['icon'=>'fa-tint',           'label'=>'Milk',        'href'=>$root.'modules/milk_production.php'],
-        ['icon'=>'fa-heartbeat',      'label'=>'Health',      'href'=>$root.'modules/health_records.php'],
-        ['icon'=>'fa-qrcode',         'label'=>'QR Scan',     'href'=>$root.'modules/qr_scan.php'],
-        ['icon'=>'fa-bell',           'label'=>'Alerts',      'href'=>$root.'modules/notifications.php'],
+        ['icon'=>'fa-tachometer-alt', 'label'=>'Dashboard', 'href'=>$root.'Farm_Caretakers_USer/dashboard.php'],
+        ['icon'=>'fa-tint',           'label'=>'Milk',       'href'=>$root.'modules/milk_production.php'],
+        ['icon'=>'fa-heartbeat',      'label'=>'Health',     'href'=>$root.'modules/health_records.php'],
+        ['icon'=>'fa-qrcode',         'label'=>'QR Scan',    'href'=>$root.'modules/qr_scan.php'],
+        ['icon'=>'fa-sign-out-alt',   'label'=>'Logout',     'href'=>$root.'auth/logout.php', 'danger'=>true],
     ],
     'dairy_cooperative' => [
-        ['icon'=>'fa-tachometer-alt', 'label'=>'Dashboard',  'href'=>$root.'Dairy_Cooperatives_USer/dashboard.php'],
+        ['icon'=>'fa-tachometer-alt', 'label'=>'Dashboard', 'href'=>$root.'Dairy_Cooperatives_USer/dashboard.php'],
         ['icon'=>'fa-tint',           'label'=>'Production', 'href'=>$root.'modules/milk_production.php'],
         ['icon'=>'fa-chart-line',     'label'=>'Analytics',  'href'=>$root.'modules/production_analytics.php'],
         ['icon'=>'fa-file-alt',       'label'=>'Reports',    'href'=>$root.'modules/reports.php'],
-        ['icon'=>'fa-bell',           'label'=>'Alerts',     'href'=>$root.'modules/notifications.php'],
+        ['icon'=>'fa-sign-out-alt',   'label'=>'Logout',     'href'=>$root.'auth/logout.php', 'danger'=>true],
     ],
     'veterinarian' => [
-        ['icon'=>'fa-tachometer-alt',     'label'=>'Dashboard', 'href'=>$root.'Veterinarians_User/dashboard.php'],
-        ['icon'=>'fa-heartbeat',          'label'=>'Health',    'href'=>$root.'modules/health_records.php'],
-        ['icon'=>'fa-syringe',            'label'=>'Vaccines',  'href'=>$root.'modules/vaccinations.php'],
-        ['icon'=>'fa-venus-mars',         'label'=>'Breeding',  'href'=>$root.'modules/breeding.php'],
-        ['icon'=>'fa-exclamation-triangle','label'=>'Alerts',   'href'=>$root.'modules/early_detection.php'],
+        ['icon'=>'fa-tachometer-alt',      'label'=>'Dashboard', 'href'=>$root.'Veterinarians_User/dashboard.php'],
+        ['icon'=>'fa-heartbeat',           'label'=>'Health',    'href'=>$root.'modules/health_records.php'],
+        ['icon'=>'fa-syringe',             'label'=>'Vaccines',  'href'=>$root.'modules/vaccinations.php'],
+        ['icon'=>'fa-venus-mars',          'label'=>'Breeding',  'href'=>$root.'modules/breeding.php'],
+        ['icon'=>'fa-sign-out-alt',        'label'=>'Logout',    'href'=>$root.'auth/logout.php', 'danger'=>true],
     ],
 ];
 $myBottomNav = $bottomNavItems[$user['role']] ?? [];
@@ -76,7 +76,13 @@ $myBottomNav = $bottomNavItems[$user['role']] ?? [];
     <div class="sidebar-footer">
         <i class="fa fa-user-circle me-1"></i>
         <strong><?= htmlspecialchars($user['full_name']) ?></strong><br>
-        <span class="badge bg-success mt-1"><?= $roleLabel ?></span>
+        <span class="badge bg-success mt-1"><?= $roleLabel ?></span><br>
+        <a href="<?= $root ?>auth/logout.php"
+           onclick="return confirm('Log out of DairyBox?')"
+           class="btn btn-sm btn-outline-danger mt-2 w-100"
+           style="font-size:.78rem">
+            <i class="fa fa-sign-out-alt me-1"></i> Logout
+        </a>
     </div>
 </aside>
 
@@ -129,8 +135,12 @@ $myBottomNav = $bottomNavItems[$user['role']] ?? [];
 <?php if (!empty($myBottomNav)): ?>
 <nav class="mobile-bottom-nav" aria-label="Mobile navigation">
     <div class="nav-items">
-        <?php foreach ($myBottomNav as $item): ?>
-        <a href="<?= $item['href'] ?>" class="nav-item">
+        <?php foreach ($myBottomNav as $item):
+            $isDanger = !empty($item['danger']);
+        ?>
+        <a href="<?= $item['href'] ?>"
+           class="nav-item <?= $isDanger ? 'nav-logout' : '' ?>"
+           <?= $isDanger ? 'onclick="return confirm(\'Log out of DairyBox?\')"' : '' ?>>
             <i class="fa <?= $item['icon'] ?>"></i>
             <span><?= $item['label'] ?></span>
         </a>

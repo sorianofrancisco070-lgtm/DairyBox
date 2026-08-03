@@ -397,6 +397,10 @@ td .progress { min-width: 70px; }
 .mobile-bottom-nav .nav-item.active i {
     color: var(--green-main);
 }
+/* Logout button – red tint */
+.mobile-bottom-nav .nav-item.nav-logout { color: #c0392b; }
+.mobile-bottom-nav .nav-item.nav-logout:hover { color: #e74c3c; }
+.mobile-bottom-nav .nav-item.nav-logout i { color: #c0392b; }
 .mobile-bottom-nav .nav-item span {
     overflow: hidden;
     text-overflow: ellipsis;
