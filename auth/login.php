@@ -6,16 +6,27 @@ require_once '../config/database.php';
 
 if (session_status() === PHP_SESSION_NONE) session_start();
 
-// Already logged in – redirect
+// Helper – get base URL of the app
+function baseUrl(): string {
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $host     = $_SERVER['HTTP_HOST'];
+    // Go one level up from /auth/ to get app root
+    $script   = str_replace('\\', '/', dirname(dirname($_SERVER['SCRIPT_NAME'])));
+    $script   = rtrim($script, '/');
+    return $protocol . '://' . $host . $script;
+}
+
+// Already logged in
 if (isset($_SESSION['user'])) {
+    $base = baseUrl();
     $role = $_SESSION['user']['role'];
     $redirects = [
-        'farm_manager'      => '../Farm_Managers_User/dashboard.php',
-        'farm_caretaker'    => '../Farm_Caretakers_USer/dashboard.php',
-        'dairy_cooperative' => '../Dairy_Cooperatives_USer/dashboard.php',
-        'veterinarian'      => '../Veterinarians_User/dashboard.php',
+        'farm_manager'      => $base . '/Farm_Managers_User/dashboard.php',
+        'farm_caretaker'    => $base . '/Farm_Caretakers_USer/dashboard.php',
+        'dairy_cooperative' => $base . '/Dairy_Cooperatives_USer/dashboard.php',
+        'veterinarian'      => $base . '/Veterinarians_User/dashboard.php',
     ];
-    header('Location: ' . ($redirects[$role] ?? '../index.php'));
+    header('Location: ' . ($redirects[$role] ?? $base . '/index.php'));
     exit;
 }
 
@@ -44,7 +55,6 @@ try {
 }
 
 if ($user && password_verify($password, $user['password'])) {
-    // Regenerate session ID to prevent fixation
     session_regenerate_id(true);
 
     $_SESSION['user'] = [
@@ -59,17 +69,16 @@ if ($user && password_verify($password, $user['password'])) {
     try {
         $db->prepare("INSERT INTO activity_log (user_id, action, module, ip_address) VALUES (?, 'Login', 'Auth', ?)")
            ->execute([$user['id'], $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0']);
-    } catch (Exception $e) {
-        // Don't block login if logging fails
-    }
+    } catch (Exception $e) { /* non-fatal */ }
 
+    $base = baseUrl();
     $redirects = [
-        'farm_manager'      => '../Farm_Managers_User/dashboard.php',
-        'farm_caretaker'    => '../Farm_Caretakers_USer/dashboard.php',
-        'dairy_cooperative' => '../Dairy_Cooperatives_USer/dashboard.php',
-        'veterinarian'      => '../Veterinarians_User/dashboard.php',
+        'farm_manager'      => $base . '/Farm_Managers_User/dashboard.php',
+        'farm_caretaker'    => $base . '/Farm_Caretakers_USer/dashboard.php',
+        'dairy_cooperative' => $base . '/Dairy_Cooperatives_USer/dashboard.php',
+        'veterinarian'      => $base . '/Veterinarians_User/dashboard.php',
     ];
-    header('Location: ' . ($redirects[$role] ?? '../index.php'));
+    header('Location: ' . ($redirects[$role] ?? $base . '/index.php'));
     exit;
 
 } else {

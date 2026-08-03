@@ -4,9 +4,6 @@
 // =========================================================
 if (session_status() === PHP_SESSION_NONE) session_start();
 
-/**
- * Redirect to login if not authenticated or wrong role.
- */
 function requireLogin(string $role = ''): void {
     if (!isset($_SESSION['user'])) {
         _redirectToLogin('Please+login+first');
@@ -25,21 +22,42 @@ function isRole(string $role): bool {
 }
 
 /**
- * Builds redirect URL to index.php relative to current script depth.
- * Works for files in:  /index.php  /modules/  /Farm_Managers_User/  etc.
+ * Build absolute base URL of the app root.
+ * Works from any subfolder depth.
  */
+function appBaseUrl(): string {
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $host     = $_SERVER['HTTP_HOST'];
+
+    // SCRIPT_NAME example: /Farm_Managers_User/dashboard.php
+    // We need everything before the last two segments
+    $script = str_replace('\\', '/', $_SERVER['SCRIPT_NAME']);
+    $parts  = explode('/', trim($script, '/'));
+
+    // Remove filename
+    array_pop($parts);
+
+    // If inside a subfolder (modules/, Farm_*/, etc.) remove that too
+    $knownFolders = [
+        'modules', 'auth',
+        'Farm_Managers_User', 'Farm_Caretakers_USer',
+        'Dairy_Cooperatives_USer', 'Veterinarians_User',
+        'config', 'includes', 'database', 'assets',
+    ];
+    if (!empty($parts) && in_array(end($parts), $knownFolders)) {
+        array_pop($parts);
+    }
+
+    $base = '/' . implode('/', array_filter($parts));
+    $base = rtrim($base, '/');
+
+    return $protocol . '://' . $host . $base;
+}
+
 function _redirectToLogin(string $error = ''): void {
-    // Count how deep we are from web root
-    $script = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
-    $depth  = substr_count(trim($script, '/'), '/');
-
-    // depth 0 = root (index.php itself)
-    // depth 1 = one folder deep (modules/, Farm_Managers_User/, etc.)
-    $prefix = $depth >= 1 ? '../' : './';
-
-    $url = $prefix . 'index.php';
+    $base = appBaseUrl();
+    $url  = $base . '/index.php';
     if ($error) $url .= '?error=' . $error;
-
     header('Location: ' . $url);
     exit;
 }
