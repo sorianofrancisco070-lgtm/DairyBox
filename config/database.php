@@ -2,11 +2,11 @@
 // =========================================================
 // DairyBox – Database Configuration
 // =========================================================
-define('DB_HOST', 'localhost');
+define('DB_HOST', 'sakura.proxy.rlwy.net');
 define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_NAME', 'dairybox_db');
-define('DB_PORT', '3306');
+define('DB_PASS', 'XrpDTsTYMBkAWcoFtkafnPRgPaadICZh');
+define('DB_NAME', 'railway');
+define('DB_PORT', '52723');
 
 function getDB(): PDO {
     static $pdo = null;
