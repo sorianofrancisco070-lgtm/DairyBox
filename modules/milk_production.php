@@ -66,9 +66,9 @@ $dayTotal = array_sum(array_column($records,'quantity_liters'));
 
 // Summary per buffalo today
 $summaryStmt = $db->prepare("
-    SELECT b.tag_number, b.name, SUM(mp.quantity_liters) as total, COUNT(*) as sessions
+    SELECT b.id, b.tag_number, b.name, SUM(mp.quantity_liters) as total, COUNT(*) as sessions
     FROM milk_production mp JOIN buffaloes b ON b.id=mp.buffalo_id
-    $where GROUP BY b.id ORDER BY total DESC
+    $where GROUP BY b.id, b.tag_number, b.name ORDER BY total DESC
 ");
 $summaryStmt->execute($params);
 $summary = $summaryStmt->fetchAll();

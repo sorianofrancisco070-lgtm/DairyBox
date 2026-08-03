@@ -1,8 +1,4 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 require_once '../config/session.php';
 require_once '../config/database.php';
 requireLogin('farm_manager');
@@ -41,10 +37,10 @@ foreach ($prodChart as $row) {
 
 // ---- Top producers ----
 $topProducers = $db->query("
-    SELECT b.tag_number, b.name, SUM(mp.quantity_liters) as total
+    SELECT b.id, b.tag_number, b.name, SUM(mp.quantity_liters) as total
     FROM milk_production mp JOIN buffaloes b ON b.id=mp.buffalo_id
     WHERE mp.record_date >= DATE_SUB(CURDATE(), INTERVAL 29 DAY)
-    GROUP BY b.id ORDER BY total DESC LIMIT 5
+    GROUP BY b.id, b.tag_number, b.name ORDER BY total DESC LIMIT 5
 ")->fetchAll();
 
 // ---- Recent notifications ----

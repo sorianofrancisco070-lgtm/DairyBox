@@ -20,17 +20,17 @@ $lowProd = $db->query("
         AND MONTH(mp.record_date)=MONTH(CURDATE())
         AND YEAR(mp.record_date)=YEAR(CURDATE())
     WHERE b.status='Active' AND b.sex='Female'
-    GROUP BY b.id
+    GROUP BY b.id, b.tag_number, b.name, b.breed, b.date_of_birth
     HAVING avg_session < 5 OR avg_session IS NULL
     ORDER BY avg_session ASC
 ")->fetchAll();
 
 // High producers (> 8 L/day avg)
 $highProd = $db->query("
-    SELECT b.tag_number, b.name, AVG(mp.quantity_liters) as avg_session
+    SELECT b.id, b.tag_number, b.name, AVG(mp.quantity_liters) as avg_session
     FROM buffaloes b JOIN milk_production mp ON mp.buffalo_id=b.id
     WHERE b.status='Active' AND MONTH(mp.record_date)=MONTH(CURDATE())
-    GROUP BY b.id HAVING avg_session >= 8 ORDER BY avg_session DESC
+    GROUP BY b.id, b.tag_number, b.name HAVING avg_session >= 8 ORDER BY avg_session DESC
 ")->fetchAll();
 
 // Females not bred in 12 months
@@ -40,7 +40,7 @@ $notBred = $db->query("
     FROM buffaloes b
     LEFT JOIN breeding_records br ON br.buffalo_id=b.id
     WHERE b.status='Active' AND b.sex='Female'
-    GROUP BY b.id
+    GROUP BY b.id, b.tag_number, b.name, b.date_of_birth
     HAVING last_bred IS NULL OR last_bred < DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
 ")->fetchAll();
 

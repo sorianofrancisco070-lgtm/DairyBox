@@ -1,6 +1,4 @@
 <?php
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
 // Called at top of every page with $pageTitle and $activeNav set
 $user = currentUser();
 $roleLabels = [

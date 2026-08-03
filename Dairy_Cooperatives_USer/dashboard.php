@@ -1,8 +1,4 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 require_once '../config/session.php';
 require_once '../config/database.php';
 requireLogin('dairy_cooperative');
@@ -34,14 +30,14 @@ try {
 
     // Top products this month
     $topProducts = $db->query("
-        SELECT cp.name, cp.unit, SUM(si.quantity) AS qty_sold, SUM(si.line_total) AS revenue
+        SELECT cp.id, cp.name, cp.unit, SUM(si.quantity) AS qty_sold, SUM(si.line_total) AS revenue
         FROM coop_sale_items si
         JOIN coop_products cp ON cp.id = si.product_id
         JOIN coop_sales s ON s.id = si.sale_id
         WHERE s.status='Completed'
           AND MONTH(s.sale_date)=MONTH(CURDATE())
           AND YEAR(s.sale_date)=YEAR(CURDATE())
-        GROUP BY cp.id ORDER BY revenue DESC LIMIT 5
+        GROUP BY cp.id, cp.name, cp.unit ORDER BY revenue DESC LIMIT 5
     ")->fetchAll();
 
     // Recent transactions

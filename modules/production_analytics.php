@@ -34,12 +34,12 @@ foreach ($daily->fetchAll() as $r) { $dLabels[] = $r['d']; $dData[] = (float)$r[
 
 // --- Per buffalo for selected month ---
 $perBuf = $db->prepare("
-    SELECT b.tag_number, b.name, SUM(mp.quantity_liters) as total,
+    SELECT b.id, b.tag_number, b.name, SUM(mp.quantity_liters) as total,
            COUNT(DISTINCT mp.record_date) as days_recorded,
            AVG(mp.quantity_liters) as avg_per_session
     FROM milk_production mp JOIN buffaloes b ON b.id=mp.buffalo_id
     WHERE YEAR(mp.record_date)=? AND MONTH(mp.record_date)=?
-    GROUP BY b.id ORDER BY total DESC
+    GROUP BY b.id, b.tag_number, b.name ORDER BY total DESC
 ");
 $perBuf->execute([$year,$month]);
 $perBufData = $perBuf->fetchAll();

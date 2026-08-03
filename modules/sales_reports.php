@@ -46,14 +46,14 @@ $periodData = $stmtPeriod->fetchAll();
 
 // ── Top Products ──────────────────────────────────────────
 $stmtTop = $db->prepare("
-    SELECT cp.name, cp.unit,
+    SELECT cp.id, cp.name, cp.unit,
            SUM(si.quantity) AS total_qty,
            SUM(si.line_total) AS total_revenue
     FROM coop_sale_items si
     JOIN coop_products cp ON cp.id = si.product_id
     JOIN coop_sales s ON s.id = si.sale_id
     WHERE s.status='Completed' AND s.sale_date BETWEEN ? AND ?
-    GROUP BY cp.id ORDER BY total_revenue DESC LIMIT 10
+    GROUP BY cp.id, cp.name, cp.unit ORDER BY total_revenue DESC LIMIT 10
 ");
 $stmtTop->execute([$dateFrom, $dateTo]);
 $topProducts = $stmtTop->fetchAll();

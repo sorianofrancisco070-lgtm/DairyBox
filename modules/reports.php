@@ -16,14 +16,14 @@ $monthName = date('F', mktime(0,0,0,$month,1));
 
 // ---- Production Report ----
 $prodData = $db->prepare("
-    SELECT b.tag_number, b.name, b.breed,
+    SELECT b.id, b.tag_number, b.name, b.breed,
            SUM(mp.quantity_liters) as total,
            AVG(mp.quantity_liters) as avg_sess,
            MAX(mp.quantity_liters) as max_sess,
            COUNT(DISTINCT mp.record_date) as days_rec
     FROM milk_production mp JOIN buffaloes b ON b.id=mp.buffalo_id
     WHERE MONTH(mp.record_date)=? AND YEAR(mp.record_date)=?
-    GROUP BY b.id ORDER BY total DESC
+    GROUP BY b.id, b.tag_number, b.name, b.breed ORDER BY total DESC
 ");
 $prodData->execute([$month,$year]);
 $prodData = $prodData->fetchAll();
