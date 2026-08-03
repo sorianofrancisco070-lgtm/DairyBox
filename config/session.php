@@ -5,19 +5,14 @@
 if (session_status() === PHP_SESSION_NONE) session_start();
 
 /**
- * Redirect to login if not authenticated, or if wrong role.
- * Uses HTTP_HOST + SCRIPT_NAME to build an absolute redirect safely.
+ * Redirect to login if not authenticated or wrong role.
  */
 function requireLogin(string $role = ''): void {
     if (!isset($_SESSION['user'])) {
-        $root = _appRoot();
-        header('Location: ' . $root . 'index.php?error=Please+login+first');
-        exit;
+        _redirectToLogin('Please+login+first');
     }
     if ($role && $_SESSION['user']['role'] !== $role) {
-        $root = _appRoot();
-        header('Location: ' . $root . 'index.php?error=Access+denied');
-        exit;
+        _redirectToLogin('Access+denied');
     }
 }
 
@@ -30,21 +25,21 @@ function isRole(string $role): bool {
 }
 
 /**
- * Returns the URL path to the project root (e.g. '/dairybox/').
- * Works whether the app lives at / or at /subdir/.
+ * Builds redirect URL to index.php relative to current script depth.
+ * Works for files in:  /index.php  /modules/  /Farm_Managers_User/  etc.
  */
-function _appRoot(): string {
-    // Walk up from the current script to find index.php
-    // The app root is always 1 or 2 levels above modules/ or dashboard dirs
-    $scriptDir = dirname($_SERVER['SCRIPT_NAME']);
-    // All pages are either in root, /modules/, or /Role_Folder/
-    // So root is the parent of those directories
-    $parts = explode('/', trim($scriptDir, '/'));
-    // Remove last segment (the immediate folder)
-    if (count($parts) > 0) array_pop($parts);
-    $base = '/' . implode('/', array_filter($parts));
-    $base = rtrim($base, '/') . '/';
-    // Ensure it's not empty
-    if ($base === '//') $base = '/';
-    return $base;
+function _redirectToLogin(string $error = ''): void {
+    // Count how deep we are from web root
+    $script = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
+    $depth  = substr_count(trim($script, '/'), '/');
+
+    // depth 0 = root (index.php itself)
+    // depth 1 = one folder deep (modules/, Farm_Managers_User/, etc.)
+    $prefix = $depth >= 1 ? '../' : './';
+
+    $url = $prefix . 'index.php';
+    if ($error) $url .= '?error=' . $error;
+
+    header('Location: ' . $url);
+    exit;
 }
