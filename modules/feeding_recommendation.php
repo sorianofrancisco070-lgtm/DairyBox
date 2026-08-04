@@ -97,27 +97,51 @@ $feedingPrograms = [
 ];
 
 // ── Pull buffalo data from DB ────────────────────────────
+try {
+// Step 1: Get all active buffaloes with milk production averages
 $buffaloes = $db->query("
-    SELECT b.*,
+    SELECT b.id, b.tag_number, b.name, b.breed, b.sex,
+           b.weight_kg, b.health_status, b.date_of_birth, b.status,
            AVG(mp.quantity_liters) as avg_session,
-           COUNT(mp.id) as total_records,
-           br.pregnancy_status,
-           br.expected_calving
+           COUNT(mp.id) as total_records
     FROM buffaloes b
-    LEFT JOIN milk_production mp ON mp.buffalo_id=b.id
-        AND MONTH(mp.record_date)=MONTH(CURDATE())
-        AND YEAR(mp.record_date)=YEAR(CURDATE())
-    LEFT JOIN (
-        SELECT buffalo_id, pregnancy_status, expected_calving
-        FROM breeding_records
-        WHERE id IN (
-            SELECT MAX(id) FROM breeding_records GROUP BY buffalo_id
-        )
-    ) br ON br.buffalo_id=b.id
-    WHERE b.status='Active'
-    GROUP BY b.id, br.pregnancy_status, br.expected_calving
+    LEFT JOIN milk_production mp
+        ON mp.buffalo_id = b.id
+        AND MONTH(mp.record_date) = MONTH(CURDATE())
+        AND YEAR(mp.record_date)  = YEAR(CURDATE())
+    WHERE b.status = 'Active'
+    GROUP BY b.id, b.tag_number, b.name, b.breed, b.sex,
+             b.weight_kg, b.health_status, b.date_of_birth, b.status
     ORDER BY b.tag_number
 ")->fetchAll();
+
+// Step 2: Get latest breeding record per buffalo separately
+$breedingMap = [];
+$breedRows = $db->query("
+    SELECT br1.buffalo_id, br1.pregnancy_status, br1.expected_calving
+    FROM breeding_records br1
+    INNER JOIN (
+        SELECT buffalo_id, MAX(breeding_date) as max_date
+        FROM breeding_records
+        GROUP BY buffalo_id
+    ) br2 ON br1.buffalo_id = br2.buffalo_id AND br1.breeding_date = br2.max_date
+")->fetchAll();
+foreach ($breedRows as $row) {
+    $breedingMap[$row['buffalo_id']] = $row;
+}
+
+// Merge breeding data into buffaloes array
+foreach ($buffaloes as &$b) {
+    $bid = $b['id'];
+    $b['pregnancy_status'] = $breedingMap[$bid]['pregnancy_status'] ?? null;
+    $b['expected_calving']  = $breedingMap[$bid]['expected_calving']  ?? null;
+}
+unset($b);
+
+} catch (Exception $e) {
+    $buffaloes = [];
+    $dbError = $e->getMessage();
+}
 
 // ── Assign feeding program per buffalo ──────────────────
 function assignFeedingProgram(array $buffalo): string {
@@ -168,6 +192,10 @@ if ($selectedId) {
 
 include '../includes/header.php';
 ?>
+
+<?php if (isset($dbError)): ?>
+<div class="alert alert-danger"><i class="fa fa-exclamation-circle me-2"></i><strong>Database Error:</strong> <?= htmlspecialchars($dbError) ?></div>
+<?php endif; ?>
 
 <!-- Page Header -->
 <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
