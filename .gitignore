@@ -16,6 +16,13 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Executables and large binaries
+*.exe
+*.msi
+*.dmg
+*.zip
+*.rar
 /var/
 
 # Local env override

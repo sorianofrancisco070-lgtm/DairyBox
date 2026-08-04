@@ -10,10 +10,8 @@
 <a href="<?= $root ?>modules/products.php"><i class="fa fa-box-open"></i> Product Management</a>
 <a href="<?= $root ?>modules/coop_inventory.php"><i class="fa fa-warehouse"></i> Inventory Management</a>
 
-<span class="nav-section">Analytics</span>
-<a href="<?= $root ?>modules/production_analytics.php"><i class="fa fa-chart-line"></i> Production Analytics</a>
-<a href="<?= $root ?>modules/reports.php"><i class="fa fa-file-alt"></i> Reports</a>
-
+<span class="nav-section">Settings</span>
+<a href="<?= $root ?>modules/payment_settings.php"><i class="fa fa-credit-card"></i> Payment Settings</a>
 
 <span class="nav-section">Alerts</span>
 <a href="<?= $root ?>modules/notifications.php"><i class="fa fa-bell"></i> Notifications</a>
