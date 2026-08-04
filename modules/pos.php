@@ -149,14 +149,14 @@ include '../includes/header.php';
     display: flex;
     flex-direction: column;
     max-height: calc(100vh - 130px);
-    overflow: hidden;
+    overflow-y: auto;           /* whole cart scrolls */
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
 }
 .cart-items {
-    flex: 1;
-    overflow-y: auto;
-    max-height: 320px;
+    overflow-y: visible;        /* items no longer need inner scroll */
+    max-height: none;
     min-height: 60px;
-    -webkit-overflow-scrolling: touch;
 }
 .cart-item {
     display: flex;
@@ -236,12 +236,14 @@ include '../includes/header.php';
         bottom: 0; left: 0; right: 0;
         z-index: 1055;
         border-radius: 18px 18px 0 0;
-        max-height: 88vh;
+        max-height: 92vh;
         transform: translateY(100%);
         transition: transform .3s cubic-bezier(.4,0,.2,1);
         box-shadow: 0 -4px 24px rgba(0,0,0,.18);
-        padding: 0 1rem 1rem;
-        overflow: hidden;
+        padding: 0 1rem 1.5rem;
+        overflow-y: auto;           /* whole drawer scrolls */
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
     }
     .cart-section.open {
         transform: translateY(0);
@@ -250,6 +252,10 @@ include '../includes/header.php';
         text-align: center;
         padding: .6rem 0 .4rem;
         cursor: pointer;
+        position: sticky;           /* handle stays at top when scrolling */
+        top: 0;
+        background: #fff;
+        z-index: 2;
     }
     .cart-drawer-handle::before {
         content: '';
@@ -259,7 +265,8 @@ include '../includes/header.php';
         border-radius: 4px;
     }
     .cart-items {
-        max-height: 38vh;
+        max-height: none;           /* no inner height limit */
+        overflow-y: visible;
     }
     .cart-section-overlay {
         position: fixed;
