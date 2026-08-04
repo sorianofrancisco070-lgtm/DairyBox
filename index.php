@@ -30,7 +30,7 @@ if (isset($_SESSION['user'])) {
     <div class="login-wrapper">
         <div class="login-card shadow-lg">
             <div class="login-header text-center">
-                <img src="assets/img/logo.png" alt="DairyBox Logo"
+                <img src="assets/img/logo.jpg" alt="DairyBox Logo"
                      style="width:120px;height:120px;object-fit:contain;border-radius:16px;display:block;margin:0 auto"
                      onerror="this.style.display='none'">
                 <h2 class="mt-2 fw-bold text-success">DairyBox</h2>

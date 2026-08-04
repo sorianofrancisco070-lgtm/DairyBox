@@ -67,7 +67,7 @@ $myBottomNav = $bottomNavItems[$user['role']] ?? [];
 <!-- Sidebar -->
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
-        <img src="<?= $root ?>assets/img/logo.png" alt="DairyBox Logo"
+        <img src="<?= $root ?>assets/img/logo.jpg" alt="DairyBox Logo"
              style="width:52px;height:52px;object-fit:contain;border-radius:10px;margin-bottom:.4rem;display:block;margin-left:auto;margin-right:auto"
              onerror="this.style.display='none'">
         <h5>DairyBox</h5>
