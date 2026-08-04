@@ -30,10 +30,12 @@ if (isset($_SESSION['user'])) {
     <div class="login-wrapper">
         <div class="login-card shadow-lg">
             <div class="login-header text-center">
-                <img src="assets/img/logo.png" alt="DairyBox Logo" class="login-logo" onerror="this.style.display='none'">
-                <h2 class="mt-2 fw-bold text-success">🐃 DairyBox</h2>
-                <p class="text-muted small">Production & Herd Health System</p>
-                <small class="text-muted" style="font-size:.7rem">South East Asian Institute of Technology</small>
+                <img src="assets/img/logo.png" alt="DairyBox Logo"
+                     style="width:120px;height:120px;object-fit:contain;border-radius:16px;display:block;margin:0 auto"
+                     onerror="this.style.display='none'">
+                <h2 class="mt-2 fw-bold text-success">DairyBox</h2>
+                <p class="text-muted small mb-0">Production & Herd Health System</p>
+                <small class="text-muted" style="font-size:.7rem">Surallah, South Cotabato</small>
             </div>
 
             <?php if (isset($_GET['error'])): ?>

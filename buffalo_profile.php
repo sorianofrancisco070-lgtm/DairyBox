@@ -524,7 +524,7 @@ if ($buffalo['date_of_birth']) {
     <!-- ===== FOOTER ===== -->
     <div class="page-footer">
         <strong>🐃 DairyBox</strong> Production & Herd Health System<br>
-        Dairy Box Surallah, D.A Compound Surallah, So.Cot<br>
+        Dairy Box Surallah, South Cotabato<br>
         Scanned: <?= date('F d, Y h:i A') ?>
     </div>
 </div>
