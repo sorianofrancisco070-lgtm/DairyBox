@@ -14,7 +14,9 @@
 <a href="<?= $root ?>modules/vaccinations.php"><i class="fa fa-syringe"></i> Vaccinations</a>
 <a href="<?= $root ?>modules/breeding.php"><i class="fa fa-venus-mars"></i> Breeding & Calving</a>
 <a href="<?= $root ?>modules/early_detection.php"><i class="fa fa-exclamation-triangle"></i> Early Detection</a>
+<a href="<?= $root ?>modules/herd_health_risk.php"><i class="fa fa-shield-alt"></i> Herd Health Risk Index</a>
 <a href="<?= $root ?>modules/decision_support.php"><i class="fa fa-brain"></i> Decision Support</a>
+<a href="<?= $root ?>modules/feeding_recommendation.php"><i class="fa fa-seedling"></i> Feeding Recommendation</a>
 
 <span class="nav-section">Operations</span>
 <a href="<?= $root ?>modules/inventory.php"><i class="fa fa-boxes"></i> Inventory</a>
