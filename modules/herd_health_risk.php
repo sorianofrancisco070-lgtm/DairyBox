@@ -40,9 +40,6 @@ $neverVacc    = (int)$db->query("
 $prodDropCount = 0;
 $bufList = $db->query("SELECT id FROM buffaloes WHERE status='Active' AND sex='Female'")->fetchAll(PDO::FETCH_COLUMN);
 foreach ($bufList as $bid) {
-    $avg = (float)$db->prepare("SELECT AVG(quantity_liters) FROM milk_production WHERE buffalo_id=? AND record_date BETWEEN DATE_SUB(CURDATE(),INTERVAL 7 DAY) AND DATE_SUB(CURDATE(),INTERVAL 1 DAY)")->execute([$bid]) ? $db->prepare("SELECT AVG(quantity_liters) FROM milk_production WHERE buffalo_id=? AND record_date BETWEEN DATE_SUB(CURDATE(),INTERVAL 7 DAY) AND DATE_SUB(CURDATE(),INTERVAL 1 DAY)")->execute([$bid]) && ($s = $db->prepare("SELECT AVG(quantity_liters) FROM milk_production WHERE buffalo_id=? AND record_date BETWEEN DATE_SUB(CURDATE(),INTERVAL 7 DAY) AND DATE_SUB(CURDATE(),INTERVAL 1 DAY)")) && $s->execute([$bid]) ? (float)$s->fetchColumn() : 0 : 0;
-
-    // Clean query
     $s = $db->prepare("SELECT AVG(quantity_liters) FROM milk_production WHERE buffalo_id=? AND record_date BETWEEN DATE_SUB(CURDATE(),INTERVAL 7 DAY) AND DATE_SUB(CURDATE(),INTERVAL 1 DAY)");
     $s->execute([$bid]); $avg7 = (float)$s->fetchColumn();
 

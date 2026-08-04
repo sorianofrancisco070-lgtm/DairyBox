@@ -110,15 +110,12 @@ $buffaloes = $db->query("
     LEFT JOIN (
         SELECT buffalo_id, pregnancy_status, expected_calving
         FROM breeding_records
-        ORDER BY breeding_date DESC
+        WHERE id IN (
+            SELECT MAX(id) FROM breeding_records GROUP BY buffalo_id
+        )
     ) br ON br.buffalo_id=b.id
     WHERE b.status='Active'
-    GROUP BY b.id, b.tag_number, b.name, b.breed, b.sex, b.weight_kg,
-             b.health_status, b.date_of_birth, b.status, b.color,
-             b.acquisition_date, b.acquisition_type, b.notes, b.photo,
-             b.created_by, b.created_at, b.updated_at,
-             b.qr_code, b.acquisition_type,
-             br.pregnancy_status, br.expected_calving
+    GROUP BY b.id, br.pregnancy_status, br.expected_calving
     ORDER BY b.tag_number
 ")->fetchAll();
 
