@@ -1,6 +1,7 @@
 <?php
 require_once '../config/session.php';
 require_once '../config/database.php';
+require_once '../includes/check_low_stock.php';
 requireLogin('dairy_cooperative');
 
 $root      = '../';
@@ -69,6 +70,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             $msg = 'Product added.';
         }
+        // Check low stock after save
+        checkLowStockNotifications($db);
         $action = 'list';
     }
 }

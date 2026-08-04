@@ -1,6 +1,7 @@
 <?php
 require_once '../config/session.php';
 require_once '../config/database.php';
+require_once '../includes/check_low_stock.php';
 requireLogin('dairy_cooperative');
 
 $root      = '../';
@@ -32,6 +33,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $db->prepare("UPDATE coop_products SET stock_qty = GREATEST(0, stock_qty - ?) WHERE id=?")->execute([$qty, $productId]);
         }
         $msg = 'Stock movement recorded.';
+
+        // Check and notify if any product is now low stock
+        checkLowStockNotifications($db);
     }
 }
 

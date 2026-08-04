@@ -1,6 +1,7 @@
 <?php
 require_once '../config/session.php';
 require_once '../config/database.php';
+require_once '../includes/check_low_stock.php';
 requireLogin('dairy_cooperative');
 
 $root      = '../';
@@ -60,6 +61,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax_sale'])) {
         }
 
         $db->commit();
+        // Check and notify if any product is now low stock after sale
+        checkLowStockNotifications($db);
         echo json_encode(['success'=>true,'sale_id'=>$saleId,'receipt_number'=>$receiptNo,'total'=>$total,'change'=>$change]);
     } catch (Exception $e) {
         $db->rollBack();
