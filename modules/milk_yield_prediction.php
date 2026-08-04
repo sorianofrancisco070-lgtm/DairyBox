@@ -1,4 +1,9 @@
 ﻿<?php
+// Show errors so blank page becomes a visible error
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 require_once '../config/session.php';
 require_once '../config/database.php';
 requireLogin();
@@ -11,6 +16,7 @@ $user      = currentUser();
 // ════════════════════════════════════════════════════════
 // HELPER: Linear Regression slope & intercept
 // ════════════════════════════════════════════════════════
+if (!function_exists('linearRegression')) {
 function linearRegression(array $y): array {
     $n = count($y);
     if ($n < 2) return ['slope' => 0, 'intercept' => $n === 1 ? $y[0] : 0];
@@ -24,15 +30,17 @@ function linearRegression(array $y): array {
         $sumX2 += $x[$i] * $x[$i];
     }
     $denom = ($n * $sumX2 - $sumX * $sumX);
-    if ($denom == 0) return ['slope' => 0, 'intercept' => $sumY / $n];
+    if ($denom == 0) return ['slope' => 0, 'intercept' => $n > 0 ? $sumY / $n : 0];
     $slope     = ($n * $sumXY - $sumX * $sumY) / $denom;
     $intercept = ($sumY - $slope * $sumX) / $n;
     return ['slope' => $slope, 'intercept' => $intercept];
+}
 }
 
 // ════════════════════════════════════════════════════════
 // 1. FETCH LAST 90 DAYS HERD PRODUCTION (by date)
 // ════════════════════════════════════════════════════════
+$fatalError      = null;
 $dailyProduction = [];
 try {
     $stmt = $db->query("
@@ -46,7 +54,7 @@ try {
         $dailyProduction[$row['record_date']] = (float)$row['total'];
     }
 } catch (Exception $e) {
-    $dailyProduction = [];
+    $fatalError = $e->getMessage();
 }
 
 // Fill any missing days with 0 for continuity
@@ -258,7 +266,25 @@ $forecastVals   = array_column($next7Days, 'predicted');
 include '../includes/header.php';
 ?>
 
-<!-- ═══════════════ SUMMARY STATS ═══════════════ -->
+<?php if ($fatalError): ?>
+<div class="alert alert-danger">
+    <i class="fa fa-exclamation-circle me-2"></i>
+    <strong>Error loading prediction data:</strong> <?= htmlspecialchars($fatalError) ?>
+</div>
+<?php endif; ?>
+
+<?php if (empty($dailyProduction) && !$fatalError): ?>
+<div class="card-section text-center py-5">
+    <div style="font-size:3rem">📊</div>
+    <h5 class="text-muted mt-2">No Production Data Available</h5>
+    <p class="text-muted small">Start recording milk production to enable yield predictions.</p>
+    <a href="milk_production.php?action=add" class="btn btn-success"><i class="fa fa-plus me-1"></i>Record Milk Production</a>
+</div>
+<?php include '../includes/footer.php'; ?>
+<?php
+exit;
+endif;
+?>
 <div class="row g-3 mb-4">
     <div class="col-6 col-md-3">
         <div class="stat-card">
