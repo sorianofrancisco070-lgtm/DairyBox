@@ -5,20 +5,18 @@
 <a href="<?= $root ?>modules/buffaloes.php"><i class="fa fa-paw"></i> Buffalo Records</a>
 <a href="<?= $root ?>modules/qr_scan.php"><i class="fa fa-qrcode"></i> QR Code Lookup</a>
 
+<span class="nav-section">Production</span>
+<a href="<?= $root ?>modules/milk_production.php"><i class="fa fa-tint"></i> Milk Production</a>
+<a href="<?= $root ?>modules/production_analytics.php"><i class="fa fa-chart-line"></i> Production Analytics</a>
+
 <span class="nav-section">Health & Breeding</span>
 <a href="<?= $root ?>modules/health_records.php"><i class="fa fa-heartbeat"></i> Health Records</a>
 <a href="<?= $root ?>modules/vaccinations.php"><i class="fa fa-syringe"></i> Vaccinations</a>
 <a href="<?= $root ?>modules/breeding.php"><i class="fa fa-venus-mars"></i> Breeding & Calving</a>
 <a href="<?= $root ?>modules/early_detection.php"><i class="fa fa-exclamation-triangle"></i> Early Detection</a>
-<a href="<?= $root ?>modules/disease_risk_prediction.php"><i class="fa fa-virus"></i> Disease Risk Prediction</a>
 <a href="<?= $root ?>modules/herd_health_risk.php"><i class="fa fa-shield-alt"></i> Herd Health Risk Index</a>
 <a href="<?= $root ?>modules/decision_support.php"><i class="fa fa-brain"></i> Decision Support</a>
 <a href="<?= $root ?>modules/feeding_recommendation.php"><i class="fa fa-seedling"></i> Feeding Recommendation</a>
-
-<span class="nav-section">Production</span>
-<a href="<?= $root ?>modules/milk_production.php"><i class="fa fa-tint"></i> Milk Production</a>
-<a href="<?= $root ?>modules/production_analytics.php"><i class="fa fa-chart-line"></i> Production Analytics</a>
-<a href="<?= $root ?>modules/milk_yield_prediction.php"><i class="fa fa-chart-bar"></i> Milk Yield Prediction</a>
 
 <span class="nav-section">Operations</span>
 <a href="<?= $root ?>modules/inventory.php"><i class="fa fa-boxes"></i> Inventory</a>
