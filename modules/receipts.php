@@ -359,8 +359,62 @@ include '../includes/header.php';
     .main-content { margin-left:0!important; padding-top:0!important; }
     .content-body { padding:0!important; }
     body { background:#fff!important; }
-    .card-section { box-shadow:none; border:1px solid #dee2e6; }
-    .table th { background:#1a6b3c!important; -webkit-print-color-adjust:exact; color:#fff!important; }
+
+    /* Remove ALL scrollbars */
+    html, body, * {
+        overflow: visible !important;
+        overflow-x: visible !important;
+        overflow-y: visible !important;
+    }
+    ::-webkit-scrollbar { display: none !important; }
+
+    /* Make card sections flat for print */
+    .card-section {
+        box-shadow: none !important;
+        border: 1px solid #dee2e6 !important;
+        border-radius: 0 !important;
+        page-break-inside: avoid;
+    }
+
+    /* Table fits full print width, no horizontal scroll */
+    .table-responsive {
+        overflow: visible !important;
+        overflow-x: visible !important;
+        width: 100% !important;
+    }
+    .table {
+        width: 100% !important;
+        table-layout: fixed !important;
+        font-size: 8pt !important;
+        border-collapse: collapse !important;
+    }
+    .table th, .table td {
+        white-space: normal !important;
+        word-break: break-word !important;
+        overflow: visible !important;
+        padding: 3pt 4pt !important;
+        font-size: 8pt !important;
+        border: 1px solid #ccc !important;
+    }
+    .table th {
+        background: #1a6b3c !important;
+        color: #fff !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    /* Shrink receipt # column */
+    .table th:first-child, .table td:first-child { width: 28% !important; }
+    .table th:nth-child(2), .table td:nth-child(2) { width: 14% !important; }
+    .table th:nth-child(3), .table td:nth-child(3) { width: 18% !important; }
+
+    /* Print header visible */
+    #printHeader { display: block !important; }
+
+    /* Page setup — landscape fits table better */
+    @page {
+        size: A4 landscape;
+        margin: 10mm;
+    }
 }
 </style>
 
@@ -415,7 +469,7 @@ include '../includes/header.php';
     </div>
 
     <!-- Print header (only shows when printing) -->
-    <div class="d-none" id="printHeader" style="display:none!important">
+    <div id="printHeader" style="display:none">
         <div class="text-center mb-3">
             <h5 class="fw-bold text-success">🐃 DairyBox Cooperative — Receipts</h5>
             <p class="text-muted small mb-0"><?= date('M d, Y', strtotime($dateF)) ?> to <?= date('M d, Y', strtotime($dateT)) ?> | Printed <?= date('M d, Y h:i A') ?></p>
