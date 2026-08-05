@@ -62,6 +62,7 @@ if ($viewId > 0) {
     padding: 1.8rem 1.6rem;
     font-family: 'Segoe UI', Arial, sans-serif;
     font-size: .9rem;
+    overflow: visible;  /* no scroll on screen either */
 }
 .receipt-header { text-align: center; margin-bottom: 1rem; }
 .receipt-header img { width: 60px; height: 60px; object-fit: contain; border-radius: 8px; margin-bottom: .4rem; }
@@ -106,36 +107,60 @@ if ($viewId > 0) {
     body * { visibility: hidden !important; }
     .receipt-card, .receipt-card * { visibility: visible !important; }
 
-    body { margin: 0; padding: 0; background: #fff !important; }
+    /* Reset body for clean print */
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff !important;
+        overflow: visible !important;
+    }
 
+    html {
+        overflow: visible !important;
+    }
+
+    /* Receipt card takes full print area, no fixed/scroll */
     .receipt-card {
-        position: fixed !important;
+        position: absolute !important;
         top: 0 !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        width: 80mm !important;          /* thermal 80mm width */
+        left: 0 !important;
+        transform: none !important;
+        width: 80mm !important;
         max-width: 80mm !important;
         padding: 4mm 5mm !important;
         border-radius: 0 !important;
         box-shadow: none !important;
         font-size: 10pt !important;
+        overflow: visible !important;
+        height: auto !important;
+        max-height: none !important;
+    }
+
+    /* Hide scrollbars completely on print */
+    ::-webkit-scrollbar { display: none !important; }
+    * { scrollbar-width: none !important; }
+
+    .receipt-wrapper {
+        padding: 0 !important;
+        overflow: visible !important;
     }
 
     .receipt-header img { width: 40px !important; height: 40px !important; }
     .receipt-header h5  { font-size: 11pt !important; }
 
-    .receipt-table { font-size: 9pt !important; }
-    .receipt-table th { font-size: 8pt !important; }
-    .receipt-totals { font-size: 9pt !important; }
+    .receipt-table      { font-size: 9pt !important; }
+    .receipt-table th   { font-size: 8pt !important; }
+    .receipt-totals     { font-size: 9pt !important; }
     .receipt-grand-total td { font-size: 11pt !important; }
-    .receipt-footer { font-size: 8pt !important; }
+    .receipt-footer     { font-size: 8pt !important; }
 
-    .receipt-actions { display: none !important; }
-    .receipt-divider { border-top: 1px dashed #000 !important; }
+    .receipt-actions    { display: none !important; }
+    .receipt-divider    { border-top: 1px dashed #000 !important; }
 
+    /* Auto page size fits the receipt content */
     @page {
         size: 80mm auto;
-        margin: 3mm 0;
+        margin: 0;
     }
 }
 </style>
