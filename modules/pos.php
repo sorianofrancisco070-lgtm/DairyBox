@@ -152,23 +152,23 @@ include '../includes/header.php';
     display: flex;
     flex-direction: column;
     max-height: calc(100vh - 130px);
-    overflow-y: auto;           /* whole cart scrolls */
+    overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
 }
 .cart-items {
-    overflow-y: visible;        /* items no longer need inner scroll */
-    max-height: none;
-    min-height: 60px;
+    min-height: 80px;
+    width: 100%;
 }
 .cart-item {
     display: flex;
     align-items: center;
     gap: .5rem;
-    padding: .45rem .2rem;
+    padding: .5rem .2rem;
     border-bottom: 1px solid #f0f0f0;
     font-size: .85rem;
     animation: slideInCart .15s ease;
+    background: #fff;
 }
 @keyframes slideInCart { from { opacity:0; transform:translateX(-8px); } to { opacity:1; transform:none; } }
 .cart-item:last-child { border-bottom: none; }
@@ -357,10 +357,10 @@ include '../includes/header.php';
         </div>
 
         <div class="cart-items" id="cartItems">
-            <p class="text-muted text-center py-3" id="emptyCart">
-                <i class="fa fa-cart-plus fa-2x mb-2 d-block opacity-50"></i>
-                Tap a product to add it
-            </p>
+            <div id="emptyCart" class="text-center py-4 text-muted">
+                <i class="fa fa-cart-plus fa-2x mb-2 d-block" style="opacity:.35"></i>
+                <span style="font-size:.85rem">Tap a product to add it to cart</span>
+            </div>
         </div>
 
         <div class="pos-totals">
@@ -603,7 +603,6 @@ function addToCart(card) {
 
 function renderCart() {
     const container = document.getElementById('cartItems');
-    const emptyMsg  = document.getElementById('emptyCart');
     const totalQty  = cart.reduce((s, i) => s + i.qty, 0);
 
     document.getElementById('cartCount').textContent = totalQty;
@@ -615,45 +614,43 @@ function renderCart() {
     if (cart.length > 0) {
         fab.style.removeProperty('display');
         document.getElementById('fabCount').textContent = totalQty;
-        recalc(); // update fabTotal inside recalc
     } else {
         fab.style.setProperty('display','none','important');
     }
 
+    // Build inner HTML — always includes the empty state (hidden when not needed)
     if (cart.length === 0) {
-        container.innerHTML = '';
-        container.appendChild(emptyMsg);
-        emptyMsg.style.display = '';
-        updateCardBadges();
-        recalc();
-        return;
+        container.innerHTML = `
+            <div id="emptyCart" class="text-center py-4 text-muted">
+                <i class="fa fa-cart-plus fa-2x mb-2 d-block" style="opacity:.35"></i>
+                <span style="font-size:.85rem">Tap a product to add it to cart</span>
+            </div>`;
+    } else {
+        container.innerHTML = cart.map((item, idx) => `
+            <div class="cart-item" id="cart-row-${idx}">
+                <div class="item-name">
+                    <span style="font-weight:700;font-size:.88rem">${escHtml(item.name)}</span><br>
+                    <small class="text-muted">₱${item.price.toFixed(2)} / ${escHtml(item.unit)}</small>
+                </div>
+                <div class="d-flex align-items-center gap-1" style="flex-shrink:0">
+                    <button class="qty-btn" onclick="changeQty(${idx},-1)">−</button>
+                    <input type="number" min="1" max="${item.max_stock}" value="${item.qty}"
+                           class="form-control form-control-sm p-0"
+                           style="width:46px;text-align:center;font-weight:700;font-size:.9rem"
+                           onchange="setQty(${idx},this.value)">
+                    <button class="qty-btn" onclick="changeQty(${idx},1)">+</button>
+                </div>
+                <div class="text-end" style="min-width:72px;flex-shrink:0">
+                    <strong class="text-success" style="font-size:.9rem">₱${(item.qty * item.price).toFixed(2)}</strong><br>
+                    <button class="btn btn-xs btn-outline-danger mt-1"
+                            onclick="removeItem(${idx})"
+                            style="padding:.15rem .4rem;font-size:.7rem">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
     }
-
-    emptyMsg.style.display = 'none';
-
-    container.innerHTML = cart.map((item, idx) => `
-        <div class="cart-item" id="cart-row-${idx}">
-            <div class="item-name">
-                ${escHtml(item.name)}
-                <br>
-                <small class="text-muted">₱${item.price.toFixed(2)} / ${escHtml(item.unit)}</small>
-            </div>
-            <div class="d-flex align-items-center gap-1">
-                <button class="qty-btn" onclick="changeQty(${idx},-1)">−</button>
-                <input type="number" min="1" max="${item.max_stock}" value="${item.qty}"
-                       class="form-control form-control-sm p-0"
-                       style="width:46px;text-align:center;font-weight:700"
-                       onchange="setQty(${idx},this.value)">
-                <button class="qty-btn" onclick="changeQty(${idx},1)">+</button>
-            </div>
-            <div class="text-end" style="min-width:68px">
-                <strong class="text-success">₱${(item.qty * item.price).toFixed(2)}</strong><br>
-                <button class="btn btn-xs btn-outline-danger mt-1" onclick="removeItem(${idx})" style="padding:.15rem .4rem;font-size:.7rem">
-                    <i class="fa fa-times"></i>
-                </button>
-            </div>
-        </div>
-    `).join('');
 
     updateCardBadges();
     recalc();
