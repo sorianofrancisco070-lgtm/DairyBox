@@ -151,15 +151,30 @@ include '../includes/header.php';
     padding: 1rem;
     display: flex;
     flex-direction: column;
-    max-height: calc(100vh - 130px);
-    overflow-y: auto;
+    height: calc(100vh - 130px);   /* fixed height */
+    overflow: hidden;              /* NO outer scroll */
+}
+
+/* Cart items — this is the ONLY scrollable part */
+.cart-items {
+    flex: 1;                       /* takes remaining space */
+    overflow-y: auto;              /* scrolls independently */
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
-}
-.cart-items {
     min-height: 80px;
-    width: 100%;
+    border-bottom: 1px solid #e9ecef;
+    margin: 0 -.2rem;
+    padding: 0 .2rem;
 }
+
+/* Totals + payment — stays locked at bottom */
+.pos-totals,
+.cart-section > .mt-2,
+.cart-section > .mt-3,
+.cart-section > .d-flex.flex-column {
+    flex-shrink: 0;
+}
+
 .cart-item {
     display: flex;
     align-items: center;
@@ -239,14 +254,16 @@ include '../includes/header.php';
         bottom: 0; left: 0; right: 0;
         z-index: 1055;
         border-radius: 18px 18px 0 0;
+        height: 92vh;              /* fixed height */
         max-height: 92vh;
         transform: translateY(100%);
         transition: transform .3s cubic-bezier(.4,0,.2,1);
         box-shadow: 0 -4px 24px rgba(0,0,0,.18);
-        padding: 0 1rem 1.5rem;
-        overflow-y: auto;           /* whole drawer scrolls */
-        overflow-x: hidden;
-        -webkit-overflow-scrolling: touch;
+        padding: 0 1rem 1rem;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;          /* NO outer scroll */
+        background: #fff;
     }
     .cart-section.open {
         transform: translateY(0);
@@ -255,8 +272,7 @@ include '../includes/header.php';
         text-align: center;
         padding: .6rem 0 .4rem;
         cursor: pointer;
-        position: sticky;           /* handle stays at top when scrolling */
-        top: 0;
+        flex-shrink: 0;
         background: #fff;
         z-index: 2;
     }
@@ -267,9 +283,13 @@ include '../includes/header.php';
         background: #dee2e6;
         border-radius: 4px;
     }
+    /* On mobile: cart-items scrolls, rest is fixed */
     .cart-items {
-        max-height: none;           /* no inner height limit */
-        overflow-y: visible;
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        border-bottom: 1px solid #e9ecef;
     }
     .cart-section-overlay {
         position: fixed;
@@ -363,6 +383,9 @@ include '../includes/header.php';
             </div>
         </div>
 
+        <!-- ── BOTTOM: always pinned, never scrolls ── -->
+        <div class="cart-bottom" style="flex-shrink:0;overflow:hidden">
+
         <div class="pos-totals">
             <div class="total-line"><span>Subtotal</span><span id="subtotalVal">₱0.00</span></div>
             <div class="total-line">
@@ -388,10 +411,7 @@ include '../includes/header.php';
                 <?php foreach ($paymentSettings as $m => $ps): ?>
                 <option value="<?= htmlspecialchars($m) ?>"><?= htmlspecialchars($ps['display_name']) ?></option>
                 <?php endforeach; ?>
-                <?php
-                // Fallback options if no settings configured
-                if (empty($paymentSettings)):
-                ?>
+                <?php if (empty($paymentSettings)): ?>
                 <option value="GCash">📱 GCash</option>
                 <option value="Maya">📱 Maya</option>
                 <option value="Bank Transfer">🏦 Bank Transfer</option>
@@ -427,7 +447,10 @@ include '../includes/header.php';
                 <i class="fa fa-trash me-1"></i>Clear Cart
             </button>
         </div>
-    </div>
+
+        </div><!-- end cart-bottom -->
+    </div><!-- end cart-section -->
+</div><!-- end pos-grid -->
 </div>
 
 <!-- Mobile Cart Overlay -->
