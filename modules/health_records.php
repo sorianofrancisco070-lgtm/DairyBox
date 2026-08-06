@@ -43,6 +43,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                ->execute([$bufId,$date,$ctype,$diag,$symp,$treat,$med,$dose,$vet,$followup?:null,$status,$notes,$user['id']]);
             if (in_array($ctype,['Illness','Injury','Disease Alert'])) {
                 $db->prepare("UPDATE buffaloes SET health_status='Sick' WHERE id=?")->execute([$bufId]);
+
+                // ── AUTOMATED DISEASE ALERT ───────────────────────────
+                $buf = $db->prepare("SELECT tag_number, name FROM buffaloes WHERE id=?");
+                $buf->execute([$bufId]); $buf = $buf->fetch();
+                $bufLabel = ($buf['name'] ? $buf['name'].' ' : '').'('.$buf['tag_number'].')';
+                $alertTitle = "Disease Alert: {$buf['tag_number']}";
+                $alertMsg   = "⚠️ {$ctype} detected for {$bufLabel}."
+                            . ($diag ? " Diagnosis: {$diag}." : '')
+                            . ($symp ? " Symptoms: {$symp}." : '')
+                            . " Logged on {$date}. Immediate veterinary attention recommended.";
+                $priority   = $ctype === 'Disease Alert' ? 'urgent' : 'high';
+
+                // Notify both farm_manager and veterinarian
+                foreach (['farm_manager','veterinarian'] as $targetRole) {
+                    // Remove previous unread alert for same buffalo
+                    $db->prepare("UPDATE notifications SET is_read=1 WHERE type='health' AND title=? AND target_role=? AND is_read=0")
+                       ->execute([$alertTitle, $targetRole]);
+                    // Insert fresh alert
+                    $db->prepare("INSERT INTO notifications (type,title,message,buffalo_id,target_role,is_read,priority,due_date) VALUES ('health',?,?,?,?,0,?,CURDATE())")
+                       ->execute([$alertTitle, $alertMsg, $bufId, $targetRole, $priority]);
+                }
+                // ─────────────────────────────────────────────────────
             }
             $msg = 'Health record added.';
         }

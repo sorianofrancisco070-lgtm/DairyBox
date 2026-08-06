@@ -10,8 +10,34 @@ $user      = currentUser();
 $action    = $_GET['action'] ?? 'list';
 $msg = $error = '';
 
-// Auto-update overdue
+// Auto-update overdue + fire alerts for newly overdue vaccinations
 $db->query("UPDATE vaccinations SET status='Overdue' WHERE next_due_date < CURDATE() AND status='Scheduled'");
+
+// Auto-alert for overdue vaccinations (creates notification if not already exists unread)
+try {
+    $overdueNew = $db->query("
+        SELECT v.*, b.tag_number, b.name
+        FROM vaccinations v JOIN buffaloes b ON b.id=v.buffalo_id
+        WHERE v.status='Overdue'
+        AND NOT EXISTS (
+            SELECT 1 FROM notifications n
+            WHERE n.type='vaccination'
+            AND n.buffalo_id=v.buffalo_id
+            AND n.title LIKE CONCAT('Overdue Vaccine:%',v.vaccine_name,'%')
+            AND n.is_read=0
+        )
+        LIMIT 20
+    ")->fetchAll();
+    foreach ($overdueNew as $ov) {
+        $label = ($ov['name']?$ov['name'].' ':'').'('.$ov['tag_number'].')';
+        $title = "Overdue Vaccine: {$ov['vaccine_name']} – {$ov['tag_number']}";
+        $msg2  = "🚨 {$ov['vaccine_name']} for {$label} was due on {$ov['next_due_date']} and has not been administered. Risk of preventable disease. Schedule immediately.";
+        foreach (['farm_manager','veterinarian','farm_caretaker'] as $tr) {
+            $db->prepare("INSERT INTO notifications (type,title,message,buffalo_id,target_role,is_read,priority,due_date) VALUES ('vaccination',?,?,?,?,0,'urgent',CURDATE())")
+               ->execute([$title,$msg2,$ov['buffalo_id'],$tr]);
+        }
+    }
+} catch (Exception $e) { /* non-fatal */ }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id      = (int)($_POST['id'] ?? 0);
